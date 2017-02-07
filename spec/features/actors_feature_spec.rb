@@ -23,8 +23,7 @@ RSpec.describe "Actors", type: :feature do
   end
 
   context "index page" do
-    # TODO
-
+    # TODO: Remove if not testing golden 7
     it "displays each actor's name and dob", points: 5 do
       visit "/actors"
 
@@ -35,6 +34,7 @@ RSpec.describe "Actors", type: :feature do
       end
     end
 
+    # TODO: Remove if not testing golden 7
     it "displays a functional delete link for each actor", points: 5 do
       visit "/actors"
 
@@ -47,19 +47,126 @@ RSpec.describe "Actors", type: :feature do
   end
 
   context "show page" do
-    # TODO
+    it "displays a count of the actor's characters", points: 5 do
+      actors = Actor.all
+      actors.each do |actor|
+        visit "/actors/#{actor.id}"
+
+        expect(page).to have_content(actor.characters.count)
+      end
+    end
+
+    it "displays a list of the actor's movies (filmography)", points: 5 do
+      actors = Actor.all
+      actors.each do |actor|
+        visit "/actors/#{actor.id}"
+
+        actor.characters.each do |character|
+          expect(page).to have_content(character.movie.title)
+        end
+      end
+    end
+
+    it "displays a form to add a new character", points: 2 do
+      actors = Actor.all
+      actors.each do |actor|
+        visit "/actors/#{actor.id}"
+
+        expect(page).to have_selector("form", count: 1)
+      end
+    end
+
+    it "creates a new character for the actor after submitting the form", points: 10 do
+      hardy = create(:actor, name: "Tom Hardy", dob: "September 15, 1977")
+
+      visit "/actors/#{hardy.id}"
+
+      expect(page).to have_selector("form")
+
+      count_of_characters = Character.where(actor_id: hardy.id).count
+
+      fill_in 'Name', with: 'Eames'
+      select 'Inception'
+      click_button 'Create Character'
+
+      expect(Character.where(actor_id: hardy.id).count).to eq(count_of_characters + 1)
+    end
+
+    it "displays a hidden input field to associate a new character to the actor", points: 10 do
+      actors = Actor.all
+      actors.each do |actor|
+        visit "/actors/#{actor.id}"
+
+        expect(page).to have_selector("input[value='#{actor.id}']", visible: false),
+          "expected to find a hidden input field with the actor's id as the value"
+      end
+    end
   end
 
   context "new form" do
-    # TODO: test validation errors without correct inputs
-    # Actor:
-    #  - name: must be present; must be unique in combination with dob
-    #  - dob: no rules
-    #  - bio: no rules
-    #  - image_url: no rules
+    # TODO: Remove if not testing golden 7
+    it 'creates a new actor after submitting the form', points: 5 do
+      visit "/actors/new"
+
+      expect(page).to have_selector("form")
+
+      count_of_actors = Actor.count
+
+      fill_in 'Name', with: 'Joseph Gordon-Levitt'
+      fill_in 'Dob', with: 'February 17, 1981'
+      click_button 'Create Actor'
+
+      new_count_of_actors = count_of_actors + 1
+      expect(Actor.count).to eq(new_count_of_actors)
+    end
+
+    it "doesn't save the record if the name is blank", points: 2 do
+      visit "/actors/new"
+
+      expect(page).to have_selector("form")
+
+      count_of_actors = Actor.count
+
+      fill_in 'Name', with: ''
+      fill_in 'Dob', with: 'September 15, 1977'
+      click_button 'Create Actor'
+
+      expect(Actor.count).to eq(count_of_actors)
+    end
+
+    it "doesn't save the record if the name isn't unique", points: 2 do
+      create(:actor, name: "Tom Hardy", dob: "September 15, 1977")
+
+      visit "/actors/new"
+
+      expect(page).to have_selector("form")
+
+      count_of_actors = Actor.count
+
+      fill_in 'Name', with: 'Tom Hardy'
+      fill_in 'Dob', with: 'September 15, 1977'
+      click_button 'Create Actor'
+
+      expect(Actor.count).to eq(count_of_actors)
+    end
   end
 
   context "edit form" do
-    # TODO
+    # TODO: Remove if not testing golden 7
+    it "updates an actor's data after submitting the form", points: 5 do
+      bella = create(:actor, name: "Bella Ramsey", dob: "unknown")
+      expect(bella.bio).to be_nil
+
+      visit "/actors/#{bella.id}/edit"
+
+      bio = 'Bella Ramsey (born 2003 or 2004) is a British child actress. She made her professional acting debut as the young noblewoman Lyanna Mormont in the HBO fantasy television series Game of Thrones.'
+      fill_in 'Dob', with: '2003'
+      fill_in 'Bio', with: bio
+      click_button 'Update Actor'
+
+      bella.reload
+      expect(bella.dob).to eq('2003')
+      expect(bella.bio).to eq(bio)
+    end
   end
 end

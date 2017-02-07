@@ -23,6 +23,7 @@ RSpec.describe "Directors", type: :feature do
   end
 
   context "index page" do
+    # TODO: Remove if not testing golden 7
     it "displays each director's name and dob", points: 5 do
       visit "/directors"
 
@@ -33,6 +34,7 @@ RSpec.describe "Directors", type: :feature do
       end
     end
 
+    # TODO: Remove if not testing golden 7
     it "displays a functional delete link for each director", points: 5 do
       visit "/directors"
 
@@ -74,20 +76,20 @@ RSpec.describe "Directors", type: :feature do
       end
     end
 
-    it "creates a new movie after submitting the form", points: 10 do
-      director = Director.last
+    it "creates a new movie for the director after submitting the form", points: 10 do
+      george_miller = create(:director, name: "George Miller", dob: "March 3, 1945")
 
-      visit "/directors/#{director.id}"
+      visit "/directors/#{george_miller.id}"
 
       expect(page).to have_selector("form")
 
-      count_of_movies = Movie.count
+      count_of_movies = Movie.where(director_id: george_miller.id).count
 
       fill_in 'Title', with: 'Mad Max: Fury Road'
       fill_in 'Year', with: 2015
       click_button 'Create Movie'
 
-      expect(Movie.count).to eq(count_of_movies + 1)
+      expect(Movie.where(director_id: george_miller.id).count).to eq(count_of_movies + 1)
     end
 
     it "displays a hidden input field to associate a new movie to the director", points: 10 do
@@ -102,7 +104,8 @@ RSpec.describe "Directors", type: :feature do
   end
 
   context "new form" do
-    it 'creates a new director after submitting the form' do
+    # TODO: Remove if not testing golden 7
+    it 'creates a new director after submitting the form', points: 5 do
       visit "/directors/new"
 
       expect(page).to have_selector("form")
@@ -117,7 +120,7 @@ RSpec.describe "Directors", type: :feature do
       expect(Director.count).to eq(new_count_of_directors)
     end
 
-    it "doesn't save the record if the name is blank" do
+    it "doesn't save the record if the name is blank", points: 2 do
       visit "/directors/new"
 
       expect(page).to have_selector("form")
@@ -131,7 +134,7 @@ RSpec.describe "Directors", type: :feature do
       expect(Director.count).to eq(count_of_directors)
     end
 
-    it "doesn't save the record if the name is not unique" do
+    it "doesn't save the record if the name isn't unique", points: 2 do
       create(:director, name: "Alfred Hitchcock", dob: "August 13, 1899")
 
       visit "/directors/new"
@@ -141,7 +144,7 @@ RSpec.describe "Directors", type: :feature do
       count_of_directors = Director.count
 
       fill_in 'Name', with: 'Alfred Hitchcock'
-      fill_in 'Dob', with: 'August 13, 1899'
+      fill_in 'Dob', with: 'March 3, 1945'
       click_button 'Create Director'
 
       expect(Director.count).to eq(count_of_directors)
@@ -149,7 +152,8 @@ RSpec.describe "Directors", type: :feature do
   end
 
   context "edit form" do
-    it "updates a director's data after submitting the form" do
+    # TODO: Remove if not testing golden 7
+    it "updates a director's data after submitting the form", points: 5 do
       hitchcock = create(:director, name: "Alfred Hitchcock", dob: "August 13, 1899")
       expect(hitchcock.bio).to be_nil
 
