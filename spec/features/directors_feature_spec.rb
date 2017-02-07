@@ -65,16 +65,16 @@ RSpec.describe "Directors", type: :feature do
       end
     end
 
-    it "displays a form to add a new movie", points: 10 do
+    it "displays a form to add a new movie", points: 2 do
       directors = Director.all
       directors.each do |director|
         visit "/directors/#{director.id}"
 
-        expect(page).to have_selector("form")
+        expect(page).to have_selector("form", count: 1)
       end
     end
 
-    it "reates a new movie after submitting the form", points: 10 do
+    it "creates a new movie after submitting the form", points: 10 do
       director = Director.last
 
       visit "/directors/#{director.id}"
@@ -113,10 +113,11 @@ RSpec.describe "Directors", type: :feature do
       fill_in 'Dob', with: 'March 3, 1945'
       click_button 'Create Director'
 
-      expect(Director.count).to eq(count_of_directors + 1)
+      new_count_of_directors = count_of_directors + 1
+      expect(Director.count).to eq(new_count_of_directors)
     end
 
-    it 'fails the validation if name is not present' do
+    it "doesn't save the record if the name is blank" do
       visit "/directors/new"
 
       expect(page).to have_selector("form")
@@ -130,15 +131,17 @@ RSpec.describe "Directors", type: :feature do
       expect(Director.count).to eq(count_of_directors)
     end
 
-    it 'fails the validation if name is not unique' do
+    it "doesn't save the record if the name is not unique" do
+      create(:director, name: "Alfred Hitchcock", dob: "August 13, 1899")
+
       visit "/directors/new"
 
       expect(page).to have_selector("form")
 
       count_of_directors = Director.count
 
-      fill_in 'Name', with: 'Martin Scorsese'
-      fill_in 'Dob', with: 'November 17, 1942'
+      fill_in 'Name', with: 'Alfred Hitchcock'
+      fill_in 'Dob', with: 'August 13, 1899'
       click_button 'Create Director'
 
       expect(Director.count).to eq(count_of_directors)
@@ -146,20 +149,20 @@ RSpec.describe "Directors", type: :feature do
   end
 
   context "edit form" do
-    it 'updates a director after submitting the form' do
-      director = Director.last
+    it "updates a director's data after submitting the form" do
+      hitchcock = create(:director, name: "Alfred Hitchcock", dob: "August 13, 1899")
+      expect(hitchcock.bio).to be_nil
 
-      visit "/directors/#{director.id}/edit"
+      visit "/directors/#{hitchcock.id}/edit"
 
-      expect(director.bio).to be_nil
-      expect(page).to have_selector("form")
-
-      bio = 'Best known for his cerebral, often nonlinear story-telling, acclaimed writer-director Christopher Nolan...'
+      bio = 'Sir Alfred Joseph Hitchcock was an English film director and producer, at times referred to as "The Master of Suspense".'
+      fill_in 'Name', with: 'Sir Alfred Joseph Hitchcock'
       fill_in 'Bio', with: bio
       click_button 'Update Director'
 
-      director.reload
-      expect(director.bio).to eq(bio)
+      hitchcock.reload
+      expect(hitchcock.name).to eq('Sir Alfred Joseph Hitchcock')
+      expect(hitchcock.bio).to eq(bio)
     end
   end
 end

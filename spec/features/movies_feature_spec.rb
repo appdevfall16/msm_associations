@@ -89,11 +89,11 @@ RSpec.describe "Movies", type: :feature do
 
       directors = Director.all
       directors.each do |director|
-        expect(page).to have_selector("select#director_id"), 'expected to find a select field for director_id in the form'
-        expect(page).to have_selector("select#director_id option[value='#{director.id}']"),
+        expect(page).to have_selector("select[name='director_id']"), 'expected to find a select field for director_id in the form'
+        expect(page).to have_selector("select[name='director_id'] option[value='#{director.id}']"),
           "expected to find a director option in the select field with a value using the director's id"
 
-        dropdown_option = find("select#director_id option[value='#{director.id}']").text
+        dropdown_option = find("select[name='director_id'] option[value='#{director.id}']").text
         expect(dropdown_option).to eq(director.name),
           "expected to find a director option in the select field displaying the director's name"
       end
@@ -113,7 +113,7 @@ RSpec.describe "Movies", type: :feature do
       movie = Movie.last
       visit "/movies/#{movie.id}/edit"
 
-      within("select#director_id") do
+      within("select[name='director_id']") do
         directors = Director.all
         directors.each do |director|
           expect(find("option[value='#{director.id}']").text).to eq(director.name)
