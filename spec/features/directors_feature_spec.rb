@@ -52,7 +52,9 @@ RSpec.describe "Directors", type: :feature do
       directors.each do |director|
         visit "/directors/#{director.id}"
 
-        expect(page).to have_content(director.movies.count)
+        count_of_movies = Movie.where(director_id: director.id).count
+
+        expect(page).to have_content(count_of_movies)
       end
     end
 
@@ -61,7 +63,8 @@ RSpec.describe "Directors", type: :feature do
       directors.each do |director|
         visit "/directors/#{director.id}"
 
-        director.movies.each do |movie|
+        movies = Movie.where(director_id: director.id)
+        movies.each do |movie|
           expect(page).to have_content(movie.title)
         end
       end

@@ -38,8 +38,11 @@ RSpec.describe "Characters", type: :feature do
 
       characters = Character.all
       characters.each do |character|
-        expect(page).to have_content(character.movie.title)
-        expect(page).to have_content(character.actor.name)
+        movie = Movie.find_by(id: character.movie_id)
+        expect(page).to have_content(movie.title)
+
+        actor = Actor.find_by(id: character.actor_id)
+        expect(page).to have_content(actor.name)
       end
     end
 
@@ -61,8 +64,11 @@ RSpec.describe "Characters", type: :feature do
       characters.each do |character|
         visit "/characters/#{character.id}"
 
-        expect(page).to have_content(character.movie.title)
-        expect(page).to have_content(character.actor.name)
+        movie = Movie.find_by(id: character.movie_id)
+        expect(page).to have_content(movie.title)
+
+        actor = Actor.find_by(id: character.actor_id)
+        expect(page).to have_content(actor.name)
       end
     end
   end

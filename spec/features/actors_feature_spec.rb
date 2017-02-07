@@ -52,7 +52,8 @@ RSpec.describe "Actors", type: :feature do
       actors.each do |actor|
         visit "/actors/#{actor.id}"
 
-        expect(page).to have_content(actor.characters.count)
+        count_of_characters = Character.where(actor_id: actor.id).count
+        expect(page).to have_content(count_of_characters)
       end
     end
 
@@ -61,8 +62,10 @@ RSpec.describe "Actors", type: :feature do
       actors.each do |actor|
         visit "/actors/#{actor.id}"
 
+        characters = Character.where(actor_id: actor.id)
         actor.characters.each do |character|
-          expect(page).to have_content(character.movie.title)
+          movie = Movie.find_by(id: character.movie_id)
+          expect(page).to have_content(movie.title)
         end
       end
     end

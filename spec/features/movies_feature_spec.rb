@@ -40,8 +40,7 @@ RSpec.describe "Movies", type: :feature do
       movies = Movie.all
       movies.each do |movie|
         director = Director.find_by(id: movie.director_id)
-        name = director.name
-        expect(page).to have_content(name)
+        expect(page).to have_content(director.name)
       end
     end
 
@@ -74,7 +73,8 @@ RSpec.describe "Movies", type: :feature do
       movies.each do |movie|
         visit "/movies/#{movie.id}"
 
-        expect(page).to have_content(movie.director.name)
+        director = Director.find_by(id: movie.director_id)
+        expect(page).to have_content(director.name)
       end
     end
 
@@ -83,7 +83,8 @@ RSpec.describe "Movies", type: :feature do
       movies.each do |movie|
         visit "/movies/#{movie.id}"
 
-        expect(page).to have_content(movie.characters.count)
+        count_of_characters = Character.where(movie_id: movie.id).count
+        expect(page).to have_content(count_of_characters)
       end
     end
 
@@ -92,8 +93,10 @@ RSpec.describe "Movies", type: :feature do
       movies.each do |movie|
         visit "/movies/#{movie.id}"
 
-        movie.characters.each do |character|
-          expect(page).to have_content(character.actor.name)
+        characters = Character.where(movie_id: movie.id)
+        characters.each do |character|
+          actor = Actor.find_by(id: character.actor_id)
+          expect(page).to have_content(actor.name)
         end
       end
     end
