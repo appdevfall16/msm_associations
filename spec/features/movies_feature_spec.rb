@@ -4,22 +4,22 @@ RSpec.describe "Movies", type: :feature do
 
   before do
     scorsese = create(:director, name: "Martin Scorsese", dob: "November 17, 1942")
-    departed = create(:movie, title: "The Departed", year: 2006, duration: 151, director: scorsese)
-    goodfellas = create(:movie, title: "Goodfellas", year: 1990, duration: 146, director: scorsese)
+    departed = create(:movie, title: "The Departed", year: 2006, duration: 151, director_id: scorsese.id)
+    goodfellas = create(:movie, title: "Goodfellas", year: 1990, duration: 146, director_id: scorsese.id)
 
     nolan = create(:director, name: "Christopher Nolan", dob: "July 30, 1970")
-    dark_knight = create(:movie, title: "The Dark Knight", year: 2008, duration: 152, director: nolan)
-    inception = create(:movie, title: "Inception", year: 2010, duration: 148, director: nolan)
+    dark_knight = create(:movie, title: "The Dark Knight", year: 2008, duration: 152, director_id: nolan.id)
+    inception = create(:movie, title: "Inception", year: 2010, duration: 148, director_id: nolan.id)
 
     leo = create(:actor, name: "Leonardo DiCaprio", dob: "November 11, 1974")
-    create(:character, name: 'Cobb', movie: inception, actor: leo)
-    create(:character, name: 'Billy Costigan', movie: departed, actor: leo)
+    create(:character, name: 'Cobb', movie_id: inception.id, actor_id: leo.id)
+    create(:character, name: 'Billy Costigan', movie_id: departed.id, actor_id: leo.id)
 
     jack = create(:actor, name: "Jack Nicholson", dob: "April 22, 1937")
-    create(:character, name: 'Frank Costello', movie: departed, actor: jack)
+    create(:character, name: 'Frank Costello', movie_id: departed.id, actor_id: jack.id)
 
     bob = create(:actor, name: "Robert De Niro", dob: "August 17, 1943")
-    create(:character, name: 'James Conway', movie: goodfellas, actor: bob)
+    create(:character, name: 'James Conway', movie_id: goodfellas.id, actor_id: bob.id)
   end
 
   context "index page" do
@@ -178,95 +178,6 @@ RSpec.describe "Movies", type: :feature do
 
       new_count_of_movies = count_of_movies + 1
       expect(Movie.count).to eq(new_count_of_movies)
-    end
-
-    it "doesn't save the record if the title is blank", points: 2 do
-      visit "/movies/new"
-
-      expect(page).to have_selector("form")
-
-      count_of_movies = Movie.count
-
-      fill_in 'Title', with: ''
-      fill_in 'Year', with: 2011
-      fill_in 'Duration', with: 126
-      fill_in 'Description', with: 'In Paris in 1931, an orphan named Hugo Cabret who lives in the walls of a train station is wrapped up in a mystery involving his late father and an automaton.'
-      select 'Martin Scorsese'
-      click_button 'Create Movie'
-
-      expect(Movie.count).to eq(count_of_movies)
-    end
-
-    it "doesn't save the record if the title and year aren't unique", points: 2 do
-      scorsese = Director.find_by(name: 'Martin Scorsese')
-      create(:movie, title: "The Wolf of Wall Street", year: 2013, duration: 180, director_id: scorsese.id)
-
-      visit "/movies/new"
-
-      expect(page).to have_selector("form")
-
-      count_of_movies = Movie.count
-
-      fill_in 'Title', with: 'The Wolf of Wall Street'
-      fill_in 'Year', with: 2013
-      fill_in 'Duration', with: 126
-      fill_in 'Description', with: 'In Paris in 1931, an orphan named Hugo Cabret who lives in the walls of a train station is wrapped up in a mystery involving his late father and an automaton.'
-      select 'Christopher Nolan'
-      click_button 'Create Movie'
-
-      expect(Movie.count).to eq(count_of_movies)
-    end
-
-    it "doesn't save the record if the director_id is blank", points: 2 do
-      visit "/movies/new"
-
-      expect(page).to have_selector("form")
-
-      count_of_movies = Movie.count
-
-      fill_in 'Title', with: 'Hugo'
-      fill_in 'Year', with: 2011
-      fill_in 'Duration', with: 126
-      fill_in 'Description', with: 'In Paris in 1931, an orphan named Hugo Cabret who lives in the walls of a train station is wrapped up in a mystery involving his late father and an automaton.'
-      # TODO: how to select is blank?
-      select ''
-      click_button 'Create Movie'
-
-      expect(Movie.count).to eq(count_of_movies)
-    end
-
-    it "doesn't save the record if the year isn't between 1870 and 2050", points: 2 do
-      visit "/movies/new"
-
-      expect(page).to have_selector("form")
-
-      count_of_movies = Movie.count
-
-      fill_in 'Title', with: 'Hugo'
-      fill_in 'Year', with: 2051
-      fill_in 'Duration', with: 126
-      fill_in 'Description', with: 'In Paris in 1931, an orphan named Hugo Cabret who lives in the walls of a train station is wrapped up in a mystery involving his late father and an automaton.'
-      select 'Martin Scorsese'
-      click_button 'Create Movie'
-
-      expect(Movie.count).to eq(count_of_movies)
-    end
-
-    it "doesn't save the record if the duration isn't between 0 and 2764800", points: 2 do
-      visit "/movies/new"
-
-      expect(page).to have_selector("form")
-
-      count_of_movies = Movie.count
-
-      fill_in 'Title', with: 'Hugo'
-      fill_in 'Year', with: 2011
-      fill_in 'Duration', with: -1
-      fill_in 'Description', with: 'In Paris in 1931, an orphan named Hugo Cabret who lives in the walls of a train station is wrapped up in a mystery involving his late father and an automaton.'
-      select 'Martin Scorsese'
-      click_button 'Create Movie'
-
-      expect(Movie.count).to eq(count_of_movies)
     end
   end
 
