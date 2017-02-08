@@ -1,13 +1,13 @@
 FactoryGirl.define do
-  factory :new_actor, class: Actor do
+  factory :actor do
   end
 
-  factory :new_character, class: Character do
+  factory :character do
   end
 
-  factory :new_director, class: Director do
+  factory :director do
   end
 
-  factory :new_movie, class: Movie do
+  factory :movie do
   end
 end

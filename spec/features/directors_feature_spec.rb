@@ -3,23 +3,23 @@ require "rails_helper"
 RSpec.describe "Directors", type: :feature do
 
   before do
-    scorsese = create(:new_director, name: "Martin Scorsese", dob: "November 17, 1942")
-    departed = create(:new_movie, title: "The Departed", year: 2006, duration: 151, director: scorsese)
-    goodfellas = create(:new_movie, title: "Goodfellas", year: 1990, duration: 146, director: scorsese)
+    scorsese = create(:director, name: "Martin Scorsese", dob: "November 17, 1942")
+    departed = create(:movie, title: "The Departed", year: 2006, duration: 151, director: scorsese)
+    goodfellas = create(:movie, title: "Goodfellas", year: 1990, duration: 146, director: scorsese)
 
-    nolan = create(:new_director, name: "Christopher Nolan", dob: "July 30, 1970")
-    dark_knight = create(:new_movie, title: "The Dark Knight", year: 2008, duration: 152, director: nolan)
-    inception = create(:new_movie, title: "Inception", year: 2010, duration: 148, director: nolan)
+    nolan = create(:director, name: "Christopher Nolan", dob: "July 30, 1970")
+    dark_knight = create(:movie, title: "The Dark Knight", year: 2008, duration: 152, director: nolan)
+    inception = create(:movie, title: "Inception", year: 2010, duration: 148, director: nolan)
 
-    leo = create(:new_actor, name: "Leonardo DiCaprio", dob: "November 11, 1974")
-    create(:new_character, name: 'Cobb', movie: inception, actor: leo)
-    create(:new_character, name: 'Billy Costigan', movie: departed, actor: leo)
+    leo = create(:actor, name: "Leonardo DiCaprio", dob: "November 11, 1974")
+    create(:character, name: 'Cobb', movie: inception, actor: leo)
+    create(:character, name: 'Billy Costigan', movie: departed, actor: leo)
 
-    jack = create(:new_actor, name: "Jack Nicholson", dob: "April 22, 1937")
-    create(:new_character, name: 'Frank Costello', movie: departed, actor: jack)
+    jack = create(:actor, name: "Jack Nicholson", dob: "April 22, 1937")
+    create(:character, name: 'Frank Costello', movie: departed, actor: jack)
 
-    bob = create(:new_actor, name: "Robert De Niro", dob: "August 17, 1943")
-    create(:new_character, name: 'James Conway', movie: goodfellas, actor: bob)
+    bob = create(:actor, name: "Robert De Niro", dob: "August 17, 1943")
+    create(:character, name: 'James Conway', movie: goodfellas, actor: bob)
   end
 
   context "index page" do
@@ -80,7 +80,7 @@ RSpec.describe "Directors", type: :feature do
     end
 
     it "creates a new movie for the director after submitting the form", points: 10 do
-      george_miller = create(:new_director, name: "George Miller", dob: "March 3, 1945")
+      george_miller = create(:director, name: "George Miller", dob: "March 3, 1945")
 
       visit "/directors/#{george_miller.id}"
 
@@ -138,7 +138,7 @@ RSpec.describe "Directors", type: :feature do
     end
 
     it "doesn't save the record if the name isn't unique", points: 2 do
-      create(:new_director, name: "Alfred Hitchcock", dob: "August 13, 1899")
+      create(:director, name: "Alfred Hitchcock", dob: "August 13, 1899")
 
       visit "/directors/new"
 
@@ -157,7 +157,7 @@ RSpec.describe "Directors", type: :feature do
   context "edit form" do
     # TODO: Remove if not testing golden 7
     it "updates a director's data after submitting the form", points: 5 do
-      hitchcock = create(:new_director, name: "Alfred Hitchcock", dob: "August 13, 1899")
+      hitchcock = create(:director, name: "Alfred Hitchcock", dob: "August 13, 1899")
       expect(hitchcock.bio).to be_nil
 
       visit "/directors/#{hitchcock.id}/edit"
